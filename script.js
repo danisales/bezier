@@ -2,7 +2,7 @@ class Point {
 	constructor(x, y){
 		this.x = x;
 		this.y = y;
-		this.radius = 10
+		this.radius = 6;
 	}
 
 	draw() {
@@ -71,6 +71,7 @@ var canvas = document.getElementById('canvas');
 var context = canvas.getContext('2d');
 var points = [];
 var indexClicked = -1;
+var isMoving = false;
 
 resizeCanvas();
 
@@ -81,10 +82,19 @@ canvas.addEventListener('mousedown', function(e){
 		points.push(p);
 		draw();
 	}	
+	isMoving = true;
+});
+
+canvas.addEventListener('mousemove', function(e){
+	if(isMoving){
+		points[indexClicked] = new Point(e.x, e.y);
+		draw();
+	}
 });
 
 canvas.addEventListener('mouseup', function(e){
 	indexClicked = -1;
+	isMoving = false;
 });
 
 canvas.addEventListener('dblclick', function(e){
