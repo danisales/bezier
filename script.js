@@ -33,11 +33,32 @@ function drawPoints() {
 	}
 }
 
+function drawLine(p1, p2){
+	context.beginPath();
+	context.strokeStyle = 'grey';
+	context.lineWidth = 3;
+	context.moveTo(p1.x, p1.y);
+	context.lineTo(p2.x, p2.y);
+	context.stroke();
+	context.fill();
+}
+
+function drawLines(){
+	for(var p in points){
+		if(p!==(points.length-1)){
+			drawLine(points[p], points[+p+1]);
+		}
+	}
+}
+
 function draw() {
   context.fillStyle = 'white';
   context.fillRect(0, 0, canvas.width, canvas.height);
   if (points.length > 0) {
     drawPoints();
+  }
+  if (points.length > 1) {
+  	drawLines();
   }
 }
 
