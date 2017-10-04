@@ -18,6 +18,32 @@ class Point {
 	}
 }
 
+function interpolation(p1, p2, t){
+	var x = (1-t) * p1.x + t * p2.x
+	var y = (1-t) * p1.y + t * p2.y
+	return new Point(x, y);
+}
+
+function deCasteljau(points, t){
+	if(points.length === 1)
+		return points[0]
+	var p = [];
+	for(var i = 0; i < points.length-1; i++){
+		p.push(interpolation(points[i], points[+i+1],t));
+	}
+	return deCasteljau(p, t);
+}
+
+function bezierPoints(points, iterations){
+	var curve = [];
+	if (points.length === 0)
+		return curve
+	for(var i = 0; i <= iterations; i++){
+		curve.push(deCasteljau(points, i/iterations));
+	}
+	return curve;
+}
+
 function getClicked(point){
 	for(var p in points){
 		if(points[p].clicked(point.x, point.y)){
@@ -33,21 +59,22 @@ function drawPoints() {
 	}
 }
 
-function drawLine(p1, p2){
+function drawLine(p1, p2, color){
 	context.beginPath();
-	context.strokeStyle = 'grey';
+	context.strokeStyle = color;
 	context.lineWidth = 3;
 	context.moveTo(p1.x, p1.y);
 	context.lineTo(p2.x, p2.y);
+	console.log(p1);
+	console.log('p2');
+	console.log(p2);
 	context.stroke();
 	context.fill();
 }
 
-function drawLines(){
-	for(var p in points){
-		if(p!==(points.length-1)){
-			drawLine(points[p], points[+p+1]);
-		}
+function drawLines(points, color){
+	for(var i = 0; i < points.length-1; i++){
+		drawLine(points[i], points[+i+1], color);
 	}
 }
 
@@ -58,7 +85,8 @@ function draw() {
     drawPoints();
   }
   if (points.length > 1) {
-  	drawLines();
+  	drawLines(bezierPoints(points, iterations), 'red');
+  	drawLines(points, 'grey');
   }
 }
 
@@ -72,6 +100,7 @@ var context = canvas.getContext('2d');
 var points = [];
 var indexClicked = -1;
 var isMoving = false;
+var iterations = 200;
 
 resizeCanvas();
 
