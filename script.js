@@ -45,7 +45,6 @@ function bezierPoints(points, iterations){
 		bezierPts.push(intPts[0]);
 	}
 	bezierPts.push(points[points.length-1]);
-
 	bezier = bezierPts;
 	blossom = area;
 }
@@ -86,11 +85,7 @@ function drawArea(points, color, width){
 function draw() {
   context.fillStyle = 'white';
   context.fillRect(0, 0, canvas.width, canvas.height);
-  if (points.length > 0) {
-  	if(showPoints)
-  		drawPoints();
-  }
-  if (points.length > 1){
+  if (points.length >= 2){
   	if(showPolygons)
   		drawLines(points, 'black', 1.5);
   }
@@ -100,6 +95,10 @@ function draw() {
   		drawArea(blossom, '#008B8B', 0.1);
   	if(showBezier)
   		drawLines(bezier, '#ff1433', 1.5);
+  }
+  if (points.length > 0) {
+  	if(showPoints)
+  		drawPoints();
   }
 }
 
