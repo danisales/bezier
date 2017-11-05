@@ -65,16 +65,6 @@ function drawPoints() {
 	}
 }
 
-function drawLine(p1, p2, color, width){
-	context.beginPath();
-	context.strokeStyle = color;
-	context.lineWidth = width;
-	context.moveTo(p1.x, p1.y);
-	context.lineTo(p2.x, p2.y);
-	context.stroke();
-	context.fill();
-}
-
 function drawLines(points, color, width){
 	context.beginPath();
 	context.strokeStyle = color;
