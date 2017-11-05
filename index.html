@@ -4,6 +4,15 @@
 	</head>
 	<body>
 		<canvas id="canvas"></canvas>
+		<div id="userInput">
+	        Iterations <input type="number" name="iterations" id="iterations" value="100">
+	        <input type="checkbox" name="points" id="points" checked=""> Points
+	        <input type="checkbox" name="polygons" id="polygons" checked=""> Polygons
+	        <input type="checkbox" name="bezier" id="bezier" checked=""> Bezier
+	        <input type="checkbox" name="blossom" id="blossom" checked=""> Blossom
+	      
+	        <button type="button" name="button" onclick="update()">Update</button>   
+	    	</div>
 		<script src="script.js"></script>
 	</body>
 </html>

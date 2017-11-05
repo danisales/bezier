@@ -2,12 +2,12 @@ class Point {
 	constructor(x, y){
 		this.x = x;
 		this.y = y;
-		this.radius = 6;
+		this.radius = 5;
 	}
 
 	draw() {
 		context.beginPath();
-		context.fillStyle = 'grey';
+		context.fillStyle = 'black';
 		context.arc(this.x, this.y, this.radius, 0, 2 * Math.PI);
 		context.fill();
 	}
@@ -19,29 +19,35 @@ class Point {
 }
 
 function interpolation(p1, p2, t){
-	var x = (1-t) * p1.x + t * p2.x
-	var y = (1-t) * p1.y + t * p2.y
+	var x = (1-t) * p1.x + t * p2.x;
+	var y = (1-t) * p1.y + t * p2.y;
 	return new Point(x, y);
 }
 
-function deCasteljau(points, t){
-	if(points.length === 1)
-		return points[0]
-	var p = [];
+function interpolatePoints(points, t){
+	var p = []
 	for(var i = 0; i < points.length-1; i++){
-		p.push(interpolation(points[i], points[+i+1],t));
+		p.push(interpolation(points[i], points[+i+1], t));
 	}
-	return deCasteljau(p, t);
+	return p;
 }
 
 function bezierPoints(points, iterations){
-	var curve = [];
-	if (points.length === 0)
-		return curve
-	for(var i = 0; i <= iterations; i++){
-		curve.push(deCasteljau(points, i/iterations));
+	var bezierPts = [];
+	var area = [];
+	t = +(1/iterations);
+	for(var i = 0; i <= 1; i+=t){
+		var intPts = interpolatePoints(points, i);
+		while(intPts.length > 1){
+			area.push(intPts);
+			intPts = interpolatePoints(intPts, i);
+		}
+		bezierPts.push(intPts[0]);
 	}
-	return curve;
+	bezierPts.push(points[points.length-1]);
+
+	bezier = bezierPts;
+	blossom = area;
 }
 
 function getClicked(point){
@@ -59,22 +65,31 @@ function drawPoints() {
 	}
 }
 
-function drawLine(p1, p2, color){
+function drawLine(p1, p2, color, width){
 	context.beginPath();
 	context.strokeStyle = color;
-	context.lineWidth = 3;
+	context.lineWidth = width;
 	context.moveTo(p1.x, p1.y);
 	context.lineTo(p2.x, p2.y);
-	console.log(p1);
-	console.log('p2');
-	console.log(p2);
 	context.stroke();
 	context.fill();
 }
 
-function drawLines(points, color){
+function drawLines(points, color, width){
+	context.beginPath();
+	context.strokeStyle = color;
+	context.lineWidth = width;
 	for(var i = 0; i < points.length-1; i++){
-		drawLine(points[i], points[+i+1], color);
+		context.moveTo(points[i].x, points[i].y);
+		context.lineTo(points[+i+1].x, points[+i+1].y);
+	}
+	context.stroke();
+	context.fill();
+}
+
+function drawArea(points, color, width){
+	for(var i = 0; i < points.length-1; i++){
+		drawLines(points[i], color, width);
 	}
 }
 
@@ -82,11 +97,19 @@ function draw() {
   context.fillStyle = 'white';
   context.fillRect(0, 0, canvas.width, canvas.height);
   if (points.length > 0) {
-    drawPoints();
+  	if(showPoints)
+  		drawPoints();
   }
-  if (points.length > 1) {
-  	drawLines(bezierPoints(points, iterations), 'red');
-  	drawLines(points, 'grey');
+  if (points.length > 1){
+  	if(showPolygons)
+  		drawLines(points, 'black', 1.5);
+  }
+  if (points.length >= 3) {
+  	bezierPoints(points, iterations);
+  	if(showBlossom)
+  		drawArea(blossom, '#008B8B', 0.1);
+  	if(showBezier)
+  		drawLines(bezier, '#ff1433', 1.5);
   }
 }
 
@@ -100,7 +123,14 @@ var context = canvas.getContext('2d');
 var points = [];
 var indexClicked = -1;
 var isMoving = false;
-var iterations = 200;
+var iterations = 100;
+var bezier = [];
+var blossom = [];
+
+var showPoints = true;
+var showPolygons = true;
+var showBezier = true;
+var showBlossom = true;
 
 resizeCanvas();
 
@@ -115,7 +145,7 @@ canvas.addEventListener('mousedown', function(e){
 });
 
 canvas.addEventListener('mousemove', function(e){
-	if(isMoving){
+	if(isMoving && showPoints){
 		points[indexClicked] = new Point(e.x, e.y);
 		draw();
 	}
@@ -128,8 +158,17 @@ canvas.addEventListener('mouseup', function(e){
 
 canvas.addEventListener('dblclick', function(e){
 	var indexClicked = getClicked(new Point(e.offsetX, e.offsetY));
-	if(indexClicked !== -1){
+	if(indexClicked !== -1 && showPoints){
 		points.splice(indexClicked, 1);
 		draw();
 	}
 });
+
+function update(){
+	iterations = document.getElementById("iterations").value;
+	showPoints = document.getElementById("points").checked;
+	showPolygons = document.getElementById("polygons").checked;
+	showBezier = document.getElementById("bezier").checked;
+	showBlossom = document.getElementById("blossom").checked;
+	draw();
+}
